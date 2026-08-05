@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>For Operators — Hélène of the West</title>
+  <meta name="description" content="Saint Lucian tour operators, guides and drivers: list your experiences with Hélène of the West. Fair terms, reliable payment, travelers who book ahead.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2323221d'/%3E%3Cpath d='M6 26 L14 8 L20 26 M17 26 L23 13 L28 26' fill='none' stroke='%23faf7f0' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container container--wide">
+      <a class="brand" href="index.html">Hélène of the West<small>Saint Lucia, curated</small></a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="experiences.html">Experiences</a>
+        <a href="transfers.html">Transfers</a>
+        <a href="about.html">About</a>
+        <a href="operators.html" aria-current="page">For Operators</a>
+        <a href="contact.html">Contact</a>
+        <a class="btn btn-primary" href="booking.html">Book Now</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-hero">
+      <div class="container">
+        <p class="eyebrow reveal">For operators, guides &amp; drivers</p>
+        <h1 class="reveal">Your island. Your business. Our bookings.</h1>
+        <p class="lede reveal reveal-d1">You run the boat, the trail, the kitchen or the taxi. We bring you travelers who book ahead, pay properly and arrive on time — and we never ask you to compromise on how you work.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;" aria-labelledby="why-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow">Why list with us</p>
+          <h2 id="why-title">Built to be worth your while</h2>
+        </div>
+        <div class="grid grid--3">
+          <div class="reveal">
+            <h4>Guests who book ahead</h4>
+            <p style="font-size: 0.95rem;">Our travelers reserve days or weeks out, with party size, pickup point and contact details confirmed. No more guessing whether the beach crowd turns into customers.</p>
+          </div>
+          <div class="reveal reveal-d1">
+            <h4>Payment you can plan on</h4>
+            <p style="font-size: 0.95rem;">Fixed rates agreed up front, settled on a schedule you can rely on. Our commission is taken from the booking — we never surprise-discount your product to fill seats.</p>
+          </div>
+          <div class="reveal reveal-d2">
+            <h4>Your name stays on it</h4>
+            <p style="font-size: 0.95rem;">You are listed as the operator, presented properly — professional photography and copy included. Guests learn who is actually taking them up the mountain.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--sand" aria-labelledby="join-title">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow">Joining</p>
+          <h2 id="join-title">Three steps to your first booking</h2>
+        </div>
+        <ol class="steps steps--row">
+          <li class="reveal">
+            <h4>Apply below</h4>
+            <p>Tell us what you run and where. Licences and insurance matter to us — have your details ready.</p>
+          </li>
+          <li class="reveal reveal-d1">
+            <h4>Meet us</h4>
+            <p>We visit, ride along or taste — every listing is experienced by our team before it goes live. Expect this within two weeks.</p>
+          </li>
+          <li class="reveal reveal-d2">
+            <h4>Go live</h4>
+            <p>We write and photograph your listing, agree rates, and switch you on. Bookings arrive by email and WhatsApp.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="apply-title">
+      <div class="container container--narrow">
+        <div class="section-head reveal">
+          <p class="eyebrow">Application</p>
+          <h2 id="apply-title">Tell us about your operation</h2>
+          <p class="lede">A few basics is all we need to start. We reply to every application within two working days.</p>
+        </div>
+
+        <form id="operator-form" class="reveal" novalidate data-validated-form>
+          <div class="form-grid">
+            <div class="field">
+              <label for="op-name">Your name</label>
+              <input type="text" id="op-name" name="name" required autocomplete="name" data-validate="name">
+              <p class="error" id="op-name-error">Please enter your full name.</p>
+            </div>
+            <div class="field">
+              <label for="op-business">Business or operating name</label>
+              <input type="text" id="op-business" name="business" required data-validate="name">
+              <p class="error" id="op-business-error">Please enter your business or operating name.</p>
+            </div>
+            <div class="field">
+              <label for="op-email">Email</label>
+              <input type="email" id="op-email" name="email" required autocomplete="email" data-validate="email">
+              <p class="error" id="op-email-error">That email address doesn’t look complete — please check it.</p>
+            </div>
+            <div class="field">
+              <label for="op-phone">Phone / WhatsApp</label>
+              <input type="tel" id="op-phone" name="phone" required autocomplete="tel" data-validate="phone">
+              <p class="error" id="op-phone-error">Please enter a phone number of at least 7 digits.</p>
+            </div>
+            <div class="field">
+              <label for="op-type">What do you offer?</label>
+              <select id="op-type" name="type" required data-validate="required">
+                <option value="">Choose one…</option>
+                <option>Tours &amp; excursions</option>
+                <option>Hiking or nature guiding</option>
+                <option>Water sports or boat charters</option>
+                <option>Food, drink or cultural experiences</option>
+                <option>Taxi or transfer driving</option>
+                <option>Something else entirely</option>
+              </select>
+              <p class="error" id="op-type-error">Please choose the closest match for what you offer.</p>
+            </div>
+            <div class="field">
+              <label for="op-area">Where do you operate?</label>
+              <select id="op-area" name="area" required data-validate="required">
+                <option value="">Choose an area…</option>
+                <option>North — Rodney Bay, Gros Islet, Cap Estate</option>
+                <option>Castries &amp; surrounds</option>
+                <option>West coast — Marigot to Soufrière</option>
+                <option>Soufrière &amp; the Pitons</option>
+                <option>South — Vieux Fort &amp; Laborie</option>
+                <option>East coast &amp; interior</option>
+                <option>Island-wide</option>
+              </select>
+              <p class="error" id="op-area-error">Please tell us where you operate.</p>
+            </div>
+            <div class="field span-2">
+              <label for="op-licence">Licence / registration status</label>
+              <select id="op-licence" name="licence" required data-validate="required">
+                <option value="">Choose one…</option>
+                <option>Fully licensed and insured</option>
+                <option>Licensed — insurance in progress</option>
+                <option>In the process of registering</option>
+                <option>Not yet — I’d like guidance</option>
+              </select>
+              <p class="error" id="op-licence-error">Please tell us your licensing status — honest answers welcome.</p>
+            </div>
+            <div class="field span-2">
+              <label for="op-pitch">Describe your experience</label>
+              <textarea id="op-pitch" name="pitch" required data-validate="message" placeholder="What do guests do, how long does it take, what makes yours the one worth booking?"></textarea>
+              <p class="error" id="op-pitch-error">Please tell us a little more — a sentence or two is plenty.</p>
+            </div>
+          </div>
+          <div class="book-nav" style="justify-content: flex-start;">
+            <button type="submit" class="btn btn-primary" disabled>Submit Application</button>
+          </div>
+          <p class="form-note" style="margin-top: var(--s-3);">We review every application personally and reply within two working days. Nothing goes live without meeting you first.</p>
+        </form>
+
+        <div class="form-success" data-form-success hidden>
+          <div class="tick" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>
+          </div>
+          <p class="eyebrow">Application received</p>
+          <h2>Thank you — we’ll be in touch</h2>
+          <p class="lede" style="margin-inline: auto;">Your application is with our partnerships team. Expect a reply at the email you provided within two working days, and a visit soon after.</p>
+          <p style="margin-top: var(--s-4); max-width: none;"><a class="btn btn-ghost" href="index.html">Back to Home</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href="index.html">Hélène of the West<small>Saint Lucia, curated</small></a>
+          <p class="footer-tag">Curated experiences and private transfers across Saint Lucia, arranged by people who call it home.</p>
+          <div class="social">
+            <a href="https://www.instagram.com" aria-label="Hélène of the West on Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a href="https://www.facebook.com" aria-label="Hélène of the West on Facebook">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 3h-2.5A4.5 4.5 0 0 0 8 7.5V10H5.5v3.5H8V21h3.5v-7.5h2.8l.7-3.5h-3.5V8c0-1 .5-1.5 1.5-1.5H15Z"/></svg>
+            </a>
+            <a href="https://www.youtube.com" aria-label="Hélène of the West on YouTube">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="3.5"/><path d="M10 9.2v5.6l5-2.8Z" fill="currentColor" stroke="none"/></svg>
+            </a>
+          </div>
+        </div>
+        <nav aria-label="Footer">
+          <h3 class="footer-head">Explore</h3>
+          <ul class="footer-nav">
+            <li><a href="experiences.html">Experiences</a></li>
+            <li><a href="transfers.html">Transfers &amp; Taxi</a></li>
+            <li><a href="booking.html">Book Now</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="operators.html">For Operators</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </nav>
+        <div>
+          <h3 class="footer-head">Contact</h3>
+          <ul class="footer-contact">
+            <li><span class="k">Email</span><a href="mailto:helenshub.info@gmail.com">helenshub.info@gmail.com</a></li>
+            <li><span class="k">Tel</span><a href="tel:+17587174814">758-717-4814</a></li>
+            <li><span class="k">Fax</span><span>758-461-9300</span></li>
+            <li><span class="k">Where</span><span>Castries, Saint Lucia<br>Serving the whole island</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-base">
+        <p class="mb-0">© <span data-year>2026</span> Hélène of the West. All rights reserved.</p>
+        <p class="mb-0">Saint Lucia, curated.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/forms.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
