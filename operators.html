@@ -92,7 +92,9 @@
           <p class="lede">A few basics is all we need to start. We reply to every application within two working days.</p>
         </div>
 
-        <form id="operator-form" class="reveal" novalidate data-validated-form>
+        <form id="operator-form" class="reveal" name="operator-application" method="POST" data-netlify="true" novalidate data-validated-form>
+          <!-- Netlify Forms: form-name is required for AJAX submissions -->
+          <input type="hidden" name="form-name" value="operator-application">
           <div class="form-grid">
             <div class="field">
               <label for="op-name">Your name</label>

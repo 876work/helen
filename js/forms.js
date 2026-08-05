@@ -5,10 +5,13 @@
    Inline errors follow the pattern <p class="error" id="{field-id}-error">.
    The submit button stays disabled until the form is valid.
 
-   ▸▸ INTEGRATION POINT ◂◂
-   sendForm() below simulates the network call. Point it at the live
-   endpoint (or a form service) and the UI — disabled states, loading
-   label, success panel — works unchanged.
+   Submissions go to Netlify Forms (https://docs.netlify.com/manage/forms/setup/):
+   each form's static HTML carries name="…", method="POST",
+   data-netlify="true" and a hidden form-name field, so Netlify registers
+   it at deploy time; sendForm() then submits with AJAX so the on-page
+   success states are kept. Note: AJAX posts only succeed on a deployed
+   Netlify site (or `netlify dev`) — on a plain local server the forms
+   show their failure state instead.
    ========================================================================== */
 
 (() => {
@@ -57,6 +60,20 @@
       });
     });
 
+    /* Inline failure note, created on first use, placed after the submit row. */
+    const showFormError = (message) => {
+      let note = form.querySelector('[data-form-error]');
+      if (!note) {
+        note = document.createElement('p');
+        note.className = 'error';
+        note.setAttribute('data-form-error', '');
+        note.setAttribute('role', 'alert');
+        form.appendChild(note);
+      }
+      note.textContent = message;
+      note.classList.toggle('is-visible', Boolean(message));
+    };
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       fields.forEach(showState);
@@ -65,28 +82,37 @@
       const original = submit.textContent;
       submit.disabled = true;
       submit.textContent = 'Sending…';
+      showFormError('');
 
-      await sendForm(form.id, Object.fromEntries(new FormData(form)));
-
-      submit.textContent = original;
-      form.hidden = true;
-      if (success) {
-        success.hidden = false;
-        success.setAttribute('tabindex', '-1');
-        success.focus({ preventScroll: false });
-        success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      try {
+        await sendForm(form);
+        submit.textContent = original;
+        form.hidden = true;
+        if (success) {
+          success.hidden = false;
+          success.setAttribute('tabindex', '-1');
+          success.focus({ preventScroll: false });
+          success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } catch (err) {
+        console.error(err);
+        submit.textContent = original;
+        submit.disabled = false;
+        showFormError('We couldn’t send that just now. Please try again in a moment, or email us directly at helenshub.info@gmail.com.');
       }
     });
 
     refresh();
   });
 
-  /* ▸▸ INTEGRATION POINT ◂◂ — replace with a POST to the live endpoint:
-       await fetch('/api/forms/' + formId, { method: 'POST', body: JSON.stringify(payload) })
-     The 900 ms delay mirrors a realistic round trip so the pending
-     state is honest. */
-  function sendForm(formId, payload) {
-    void formId; void payload;
-    return new Promise((resolve) => setTimeout(resolve, 900));
+  /* Netlify Forms AJAX submission: POST the URL-encoded fields (including
+     the hidden form-name) to any path on the site — "/" by convention. */
+  async function sendForm(form) {
+    const res = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(new FormData(form)).toString(),
+    });
+    if (!res.ok) throw new Error(`Netlify form submission failed (${res.status})`);
   }
 })();

@@ -1,12 +1,18 @@
 /* ==========================================================================
-   Booking flow — four validated steps, a simulated confirmation call,
+   Booking flow — four validated steps, submission to Netlify Forms,
    and a generated reference number.
 
+   Submissions are recorded via Netlify Forms
+   (https://docs.netlify.com/manage/forms/setup/): the static form in
+   booking.html carries name="booking", method="POST", data-netlify="true"
+   and hidden fields registering every JS-provided field name; AJAX posts
+   only succeed on a deployed Netlify site (or `netlify dev`).
+
    ▸▸ INTEGRATION POINT ◂◂
-   Everything UI-side is real. The one simulated piece is submitBooking()
-   at the bottom of this file: replace its body with a POST to the live
-   reservations API (payload shape documented there) and the rest of the
-   flow — validation, loading state, confirmation screen — works unchanged.
+   Payment capture and live availability checks are still simulated —
+   when a real reservations API exists, replace submitBooking() at the
+   bottom of this file; the rest of the flow (validation, loading state,
+   confirmation screen) works unchanged.
    ========================================================================== */
 
 (() => {
@@ -265,20 +271,34 @@
 
   /* ------------------------------------------------ confirm & done */
 
+  const confirmError = form.querySelector('[data-confirm-error]');
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!stepValid(0) || !stepValid(1) || !stepValid(2)) return;
 
     const booking = collect();
+    confirmError.classList.remove('is-visible');
 
-    /* Loading state while the (simulated) reservation call runs. */
+    /* Loading state while the reservation is recorded. */
     steps.forEach((s) => { s.hidden = true; s.classList.remove('is-active'); });
     const loading = stepByName('loading');
     loading.hidden = false;
     loading.classList.add('is-active');
     progress.forEach((li) => li.classList.add('is-done'));
 
-    const { reference } = await submitBooking(booking);
+    let reference;
+    try {
+      ({ reference } = await submitBooking(booking));
+    } catch (err) {
+      console.error(err);
+      loading.hidden = true;
+      loading.classList.remove('is-active');
+      goTo(3);
+      confirmError.textContent = 'We couldn’t send your booking just now. Please try again in a moment, or call us on 758-717-4814 and we’ll hold it by phone.';
+      confirmError.classList.add('is-visible');
+      return;
+    }
 
     loading.hidden = true;
     loading.classList.remove('is-active');
@@ -299,30 +319,45 @@
   refreshButtons();
 
   /* ==================================================================
+     Record the booking as a Netlify Forms submission
+     (https://docs.netlify.com/manage/forms/setup/). The reference is
+     generated client-side and included in the submission so it appears
+     in Netlify's form notifications alongside the guest's details.
+
      ▸▸ INTEGRATION POINT ◂◂
-     Replace this simulation with the live reservations API, e.g.:
-
-       const res = await fetch('/api/bookings', {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({
-           experienceId: booking.experience.id,
-           date: booking.date, time: booking.time,
-           guests: booking.guests,
-           pickup: { area: booking.area, detail: booking.pickup },
-           contact: { firstName, lastName, email, phone, notes },
-         }),
-       });
-       return res.json();   // → { reference: 'HW-XXXXXX' }
-
-     Payment capture and live availability checks belong on the server
-     side of that call. The UI already handles the pending state.
+     Payment capture and live availability checks are not part of
+     Netlify Forms — when a real reservations API exists, point this
+     POST at it instead and return its reference. The UI already
+     handles the pending and failure states.
      ================================================================== */
-  function submitBooking(booking) {
-    void booking; /* payload is ready for the API — unused in simulation */
+  async function submitBooking(booking) {
     const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-    let ref = 'HW-';
-    for (let i = 0; i < 6; i++) ref += alphabet[Math.floor(Math.random() * alphabet.length)];
-    return new Promise((resolve) => setTimeout(() => resolve({ reference: ref }), 1600));
+    let reference = 'HW-';
+    for (let i = 0; i < 6; i++) reference += alphabet[Math.floor(Math.random() * alphabet.length)];
+
+    /* Field names must match the inputs registered in booking.html's
+       static form so Netlify accepts and stores each of them. */
+    const res = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        'form-name': 'booking',
+        reference,
+        experience: `${booking.experience.title} (${booking.experience.id})`,
+        date: booking.date,
+        time: booking.time,
+        guests: String(booking.guests),
+        area: booking.area,
+        pickup: booking.pickup,
+        firstName: booking.firstName,
+        lastName: booking.lastName,
+        email: booking.email,
+        phone: booking.phone,
+        notes: booking.notes,
+        total: `US$${booking.total}`,
+      }).toString(),
+    });
+    if (!res.ok) throw new Error(`Netlify form submission failed (${res.status})`);
+    return { reference };
   }
 })();

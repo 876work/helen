@@ -41,12 +41,26 @@ python3 -m http.server 8000
 - **`js/main.js`** — header state, mobile menu, scroll reveal, cursor-trail
   gallery (distance-gated spawning, touch support, disabled on small screens
   and for reduced motion).
-- **`js/booking.js`** — the booking flow. Payment and availability are
-  simulated; search for `INTEGRATION POINT` for the exact function to replace
-  with the live reservations API. Validation, loading state and the
-  confirmation screen work unchanged once it's connected.
-- **`js/forms.js`** — shared validation for the contact and operator forms,
-  with its own `INTEGRATION POINT` for a live endpoint.
+- **`js/booking.js`** — the booking flow. Submissions are recorded via
+  Netlify Forms (form name `booking`, reference number included). Payment
+  and availability are still simulated; search for `INTEGRATION POINT` for
+  the function to point at a live reservations API later.
+- **`js/forms.js`** — shared validation for the contact and operator forms;
+  submissions go to Netlify Forms (form names `contact` and
+  `operator-application`).
+
+## Netlify Forms
+
+All three forms follow [the Netlify Forms setup](https://docs.netlify.com/manage/forms/setup/):
+static `<form>` tags carry `name`, `method="POST"`, `data-netlify="true"`
+and a hidden `form-name` input, and submissions are sent with AJAX so the
+in-page success states are kept. Fields the booking flow fills via
+JavaScript are registered with empty hidden inputs in `booking.html`.
+
+- Enable **form detection** for the site in Netlify (Project configuration
+  → Forms) before deploying, or submissions will 404.
+- AJAX posts only succeed on the deployed site or under `netlify dev` — on
+  a plain local server the forms show their failure state instead.
 
 ## Imagery
 

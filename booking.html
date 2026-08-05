@@ -48,7 +48,15 @@
           <li>4 <span>Review &amp; confirm</span></li>
         </ol>
 
-        <form id="booking-form" novalidate>
+        <form id="booking-form" name="booking" method="POST" data-netlify="true" novalidate>
+          <!-- Netlify Forms: form-name is required for AJAX submissions.
+               The empty hidden fields below only register JS-provided field
+               names with Netlify at deploy time — their values are set in
+               js/booking.js when the booking is submitted. -->
+          <input type="hidden" name="form-name" value="booking">
+          <input type="hidden" name="experience">
+          <input type="hidden" name="total">
+          <input type="hidden" name="reference">
 
           <!-- ============================================ Step 1: select -->
           <section class="book-step is-active" data-step="0" aria-label="Step 1: choose an experience or transfer">
@@ -155,6 +163,7 @@
               <span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 1.5l5.5 2v4c0 3.4-2.3 5.9-5.5 7-3.2-1.1-5.5-3.6-5.5-7v-4Z"/><path d="M5.5 8l1.8 1.8L11 6"/></svg>Verified local drivers</span>
             </div>
             <p class="form-note">By confirming you agree to hold this booking. Payment is collected on the day or by secure link — whichever you prefer — and cancellation is free up to 48 hours before departure.</p>
+            <p class="error" data-confirm-error role="alert"></p>
             <div class="book-nav">
               <button type="button" class="btn-back" data-back>← Back</button>
               <button type="submit" class="btn btn-primary" data-confirm>Confirm Booking</button>

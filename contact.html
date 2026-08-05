@@ -42,7 +42,9 @@
       <div class="container">
         <div class="detail-layout">
           <div>
-            <form id="contact-form" class="reveal" novalidate data-validated-form>
+            <form id="contact-form" class="reveal" name="contact" method="POST" data-netlify="true" novalidate data-validated-form>
+              <!-- Netlify Forms: form-name is required for AJAX submissions -->
+              <input type="hidden" name="form-name" value="contact">
               <div class="form-grid">
                 <div class="field">
                   <label for="ct-name">Your name</label>
