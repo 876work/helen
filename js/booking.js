@@ -70,13 +70,23 @@
   const guestsEl = form.querySelector('#bk-guests');
   const areaEl = form.querySelector('#bk-area');
   const pickupEl = form.querySelector('#bk-pickup');
+  const flightEl = form.querySelector('#bk-flight');
+  const flightField = form.querySelector('[data-flight-field]');
 
-  /* Bookings open from tomorrow, up to 18 months out. */
+  /* Airport transfers promise flight tracking, so the flight number is
+     required for that product and hidden for everything else. */
+  const needsFlight = () => state.experienceId === 'airport-transfer';
+
+  /* Bookings open from tomorrow, up to 18 months out. Format from local
+     date parts — toISOString() would shift the boundary into the next UTC
+     day and block next-day bookings for evening visitors west of UTC
+     (Saint Lucia is UTC−4, so this bit every evening after 8 PM). */
+  const iso = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const horizon = new Date();
   horizon.setMonth(horizon.getMonth() + 18);
-  const iso = (d) => d.toISOString().slice(0, 10);
   dateEl.min = iso(tomorrow);
   dateEl.max = iso(horizon);
 
@@ -99,6 +109,15 @@
         return `<option value="${n}">${n} guest${n > 1 ? 's' : ''}</option>`;
       }).join('');
 
+    /* Show or reset the flight field to match the selected product. */
+    flightField.hidden = !needsFlight();
+    flightEl.toggleAttribute('required', needsFlight());
+    if (!needsFlight()) {
+      flightEl.value = '';
+      flightEl.removeAttribute('aria-invalid');
+      document.getElementById('bk-flight-error').classList.remove('is-visible');
+    }
+
     form.querySelector('[data-selected-summary]').innerHTML =
       `Arranging: <strong>${exp.title}</strong> — ${exp.duration}, ${exp.group.toLowerCase()}.`;
   }
@@ -112,6 +131,7 @@
     'bk-guests': (v) => Boolean(v),
     'bk-area': (v) => Boolean(v),
     'bk-pickup': (v) => v.trim().length >= 3,
+    'bk-flight': (v) => !needsFlight() || v.trim().length >= 3,
     'bk-first': (v) => v.trim().length >= 2,
     'bk-last': (v) => v.trim().length >= 2,
     'bk-email': (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()),
@@ -119,7 +139,7 @@
   };
 
   const STEP_FIELDS = {
-    1: ['bk-date', 'bk-time', 'bk-guests', 'bk-area', 'bk-pickup'],
+    1: ['bk-date', 'bk-time', 'bk-guests', 'bk-area', 'bk-pickup', 'bk-flight'],
     2: ['bk-first', 'bk-last', 'bk-email', 'bk-phone'],
   };
 
@@ -212,6 +232,7 @@
       guests,
       area: areaEl.value,
       pickup: pickupEl.value.trim(),
+      flight: needsFlight() ? flightEl.value.trim() : '',
       firstName: form.querySelector('#bk-first').value.trim(),
       lastName: form.querySelector('#bk-last').value.trim(),
       email: form.querySelector('#bk-email').value.trim(),
@@ -244,6 +265,7 @@
           <dt>Time</dt><dd>${b.time}</dd>
           <dt>Guests</dt><dd>${b.guests}</dd>
           <dt>Pickup</dt><dd>${escapeHTML(b.pickup)}, ${b.area}</dd>
+          ${b.flight ? `<dt>Flight</dt><dd>${escapeHTML(b.flight)}</dd>` : ''}
         </dl>
       </div>
       <div class="review-block">
@@ -313,6 +335,7 @@
       <dt>Date</dt><dd>${prettyDate(booking.date)} at ${booking.time}</dd>
       <dt>Guests</dt><dd>${booking.guests}</dd>
       <dt>Pickup</dt><dd>${escapeHTML(booking.pickup)}, ${booking.area}</dd>
+      ${booking.flight ? `<dt>Flight</dt><dd>${escapeHTML(booking.flight)}</dd>` : ''}
       <dt>Total</dt><dd>US$${booking.total} — payable on the day or by secure link</dd>`;
   });
 
@@ -349,6 +372,7 @@
         guests: String(booking.guests),
         area: booking.area,
         pickup: booking.pickup,
+        flight: booking.flight,
         firstName: booking.firstName,
         lastName: booking.lastName,
         email: booking.email,

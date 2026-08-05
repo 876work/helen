@@ -108,6 +108,12 @@
                 <input type="text" id="bk-pickup" name="pickup" required autocomplete="off" placeholder="e.g. Bay Gardens Beach Resort, Rodney Bay">
                 <p class="error" id="bk-pickup-error">Please give us a hotel, villa or address so your driver can find you.</p>
               </div>
+              <!-- Shown and required only for airport transfers, which include flight tracking. -->
+              <div class="field span-2" data-flight-field hidden>
+                <label for="bk-flight">Flight number</label>
+                <input type="text" id="bk-flight" name="flight" autocomplete="off" placeholder="e.g. BA2157">
+                <p class="error" id="bk-flight-error">Please give us your flight number so your driver can track the arrival.</p>
+              </div>
             </div>
             <div class="book-nav">
               <button type="button" class="btn-back" data-back>← Back</button>
