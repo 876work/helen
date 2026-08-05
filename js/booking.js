@@ -72,10 +72,24 @@
   const pickupEl = form.querySelector('#bk-pickup');
   const flightEl = form.querySelector('#bk-flight');
   const flightField = form.querySelector('[data-flight-field]');
+  const routeEl = form.querySelector('#bk-route');
+  const routeField = form.querySelector('[data-route-field]');
+  const areaField = form.querySelector('[data-area-field]');
 
   /* Airport transfers promise flight tracking, so the flight number is
      required for that product and hidden for everything else. */
   const needsFlight = () => state.experienceId === 'airport-transfer';
+
+  /* Transfers are priced per route from the published fare guide rather
+     than a single catalogue price, so the booking total always matches
+     the fare shown on the Transfers page. The route replaces the pickup
+     area, which would otherwise duplicate the route's origin. */
+  const needsRoute = () => state.experienceId === 'airport-transfer';
+
+  routeEl.innerHTML =
+    '<option value="">Select your route…</option>' +
+    TRANSFER_ROUTES.map((r, i) => `<option value="${i}">${r.from} → ${r.to} — US$${r.fare}</option>`).join('') +
+    '<option value="other">Another route — we’ll quote you</option>';
 
   /* Bookings open from tomorrow, up to 18 months out. Format from local
      date parts — toISOString() would shift the boundary into the next UTC
@@ -109,7 +123,7 @@
         return `<option value="${n}">${n} guest${n > 1 ? 's' : ''}</option>`;
       }).join('');
 
-    /* Show or reset the flight field to match the selected product. */
+    /* Show or reset the product-specific fields. */
     flightField.hidden = !needsFlight();
     flightEl.toggleAttribute('required', needsFlight());
     if (!needsFlight()) {
@@ -117,6 +131,15 @@
       flightEl.removeAttribute('aria-invalid');
       document.getElementById('bk-flight-error').classList.remove('is-visible');
     }
+
+    routeField.hidden = !needsRoute();
+    areaField.hidden = needsRoute();
+    routeEl.toggleAttribute('required', needsRoute());
+    areaEl.toggleAttribute('required', !needsRoute());
+    const stale = needsRoute() ? [areaEl, 'bk-area-error'] : [routeEl, 'bk-route-error'];
+    stale[0].value = '';
+    stale[0].removeAttribute('aria-invalid');
+    document.getElementById(stale[1]).classList.remove('is-visible');
 
     form.querySelector('[data-selected-summary]').innerHTML =
       `Arranging: <strong>${exp.title}</strong> — ${exp.duration}, ${exp.group.toLowerCase()}.`;
@@ -129,7 +152,8 @@
     'bk-date': (v) => Boolean(v) && v >= dateEl.min && v <= dateEl.max,
     'bk-time': (v) => Boolean(v),
     'bk-guests': (v) => Boolean(v),
-    'bk-area': (v) => Boolean(v),
+    'bk-area': (v) => needsRoute() || Boolean(v),
+    'bk-route': (v) => !needsRoute() || Boolean(v),
     'bk-pickup': (v) => v.trim().length >= 3,
     'bk-flight': (v) => !needsFlight() || v.trim().length >= 3,
     'bk-first': (v) => v.trim().length >= 2,
@@ -139,7 +163,7 @@
   };
 
   const STEP_FIELDS = {
-    1: ['bk-date', 'bk-time', 'bk-guests', 'bk-area', 'bk-pickup', 'bk-flight'],
+    1: ['bk-date', 'bk-time', 'bk-guests', 'bk-area', 'bk-route', 'bk-pickup', 'bk-flight'],
     2: ['bk-first', 'bk-last', 'bk-email', 'bk-phone'],
   };
 
@@ -224,13 +248,28 @@
   function collect() {
     const exp = getExperience(state.experienceId);
     const guests = Number(guestsEl.value || 1);
-    const total = exp.pricingUnit === 'vehicle' ? exp.price : exp.price * guests;
+
+    /* Route-priced transfers take their fare from the published guide.
+       An unlisted route has no fixed fare, so the total is quoted by the
+       team rather than guessed here — `total: null` signals that. */
+    const route = needsRoute() && routeEl.value !== '' && routeEl.value !== 'other'
+      ? TRANSFER_ROUTES[Number(routeEl.value)]
+      : null;
+    const routeLabel = !needsRoute()
+      ? ''
+      : route ? `${route.from} → ${route.to}` : 'Another route — to be quoted';
+
+    let total;
+    if (needsRoute()) total = route ? route.fare : null;
+    else total = exp.pricingUnit === 'vehicle' ? exp.price : exp.price * guests;
+
     return {
       experience: exp,
       date: dateEl.value,
       time: timeEl.value,
       guests,
-      area: areaEl.value,
+      area: needsRoute() ? '' : areaEl.value,
+      routeLabel,
       pickup: pickupEl.value.trim(),
       flight: needsFlight() ? flightEl.value.trim() : '',
       firstName: form.querySelector('#bk-first').value.trim(),
@@ -241,6 +280,14 @@
       total,
     };
   }
+
+  /* A null total means the route is unlisted and will be quoted. */
+  const totalAmount = (b) => (b.total === null ? 'On quote' : `US$${b.total}`);
+  const totalBasis = (b) => {
+    if (b.total === null) return 'fare confirmed before travel';
+    if (b.routeLabel) return 'per vehicle, published fare';
+    return b.experience.pricingUnit === 'vehicle' ? 'per vehicle' : `${b.guests} × US$${b.experience.price}`;
+  };
 
   const prettyDate = (isoStr) =>
     new Date(`${isoStr}T12:00:00`).toLocaleDateString('en-GB', {
@@ -264,7 +311,8 @@
           <dt>Date</dt><dd>${prettyDate(b.date)}</dd>
           <dt>Time</dt><dd>${b.time}</dd>
           <dt>Guests</dt><dd>${b.guests}</dd>
-          <dt>Pickup</dt><dd>${escapeHTML(b.pickup)}, ${b.area}</dd>
+          ${b.routeLabel ? `<dt>Route</dt><dd>${escapeHTML(b.routeLabel)}</dd>` : ''}
+          <dt>Pickup</dt><dd>${escapeHTML(b.pickup)}${b.area ? `, ${b.area}` : ''}</dd>
           ${b.flight ? `<dt>Flight</dt><dd>${escapeHTML(b.flight)}</dd>` : ''}
         </dl>
       </div>
@@ -278,8 +326,8 @@
         </dl>
       </div>
       <p class="total-line">
-        <span>Total <small>${b.experience.pricingUnit === 'vehicle' ? 'per vehicle' : `${b.guests} × US$${b.experience.price}`}</small></span>
-        <span>US$${b.total}</span>
+        <span>Total <small>${totalBasis(b)}</small></span>
+        <span>${totalAmount(b)}</span>
       </p>`;
 
     form.querySelectorAll('[data-edit]').forEach((btn) =>
@@ -334,9 +382,12 @@
       <dt>Experience</dt><dd>${booking.experience.title}</dd>
       <dt>Date</dt><dd>${prettyDate(booking.date)} at ${booking.time}</dd>
       <dt>Guests</dt><dd>${booking.guests}</dd>
-      <dt>Pickup</dt><dd>${escapeHTML(booking.pickup)}, ${booking.area}</dd>
+      ${booking.routeLabel ? `<dt>Route</dt><dd>${escapeHTML(booking.routeLabel)}</dd>` : ''}
+      <dt>Pickup</dt><dd>${escapeHTML(booking.pickup)}${booking.area ? `, ${booking.area}` : ''}</dd>
       ${booking.flight ? `<dt>Flight</dt><dd>${escapeHTML(booking.flight)}</dd>` : ''}
-      <dt>Total</dt><dd>US$${booking.total} — payable on the day or by secure link</dd>`;
+      <dt>Total</dt><dd>${booking.total === null
+        ? 'Quoted before travel — we’ll confirm your fare by email'
+        : `US$${booking.total} — payable on the day or by secure link`}</dd>`;
   });
 
   refreshButtons();
@@ -371,6 +422,7 @@
         time: booking.time,
         guests: String(booking.guests),
         area: booking.area,
+        route: booking.routeLabel,
         pickup: booking.pickup,
         flight: booking.flight,
         firstName: booking.firstName,
@@ -378,7 +430,7 @@
         email: booking.email,
         phone: booking.phone,
         notes: booking.notes,
-        total: `US$${booking.total}`,
+        total: booking.total === null ? 'To be quoted' : `US$${booking.total}`,
       }).toString(),
     });
     if (!res.ok) throw new Error(`Netlify form submission failed (${res.status})`);

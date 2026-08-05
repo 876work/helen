@@ -45,6 +45,15 @@ python3 -m http.server 8000
   Netlify Forms (form name `booking`, reference number included). Payment
   and availability are still simulated; search for `INTEGRATION POINT` for
   the function to point at a live reservations API later.
+
+  Pricing has two modes. Most experiences use the catalogue `price`
+  (× guests, or flat for `pricingUnit: 'vehicle'`). Airport transfers are
+  priced per route from `TRANSFER_ROUTES`, so the booking total always
+  matches the fare published on the Transfers page; the route select
+  replaces the pickup-area field for that product, and an unlisted route
+  submits with the total pending a quote rather than guessing a fare.
+  `airport-transfer.price` is display-only and should stay equal to the
+  lowest published fare so its "from" price stays truthful.
 - **`js/forms.js`** — shared validation for the contact and operator forms;
   submissions go to Netlify Forms (form names `contact` and
   `operator-application`).

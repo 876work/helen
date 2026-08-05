@@ -96,12 +96,20 @@
                 </select>
                 <p class="error" id="bk-guests-error">Please tell us how many guests are coming.</p>
               </div>
-              <div class="field">
+              <div class="field" data-area-field>
                 <label for="bk-area">Pickup area</label>
                 <select id="bk-area" name="area" required>
                   <option value="">Where are you staying?</option>
                 </select>
                 <p class="error" id="bk-area-error">Please choose the area we should collect you from.</p>
+              </div>
+              <!-- Replaces the pickup area for transfers: the route sets the fare. -->
+              <div class="field" data-route-field hidden>
+                <label for="bk-route">Route</label>
+                <select id="bk-route" name="route">
+                  <option value="">Select your route…</option>
+                </select>
+                <p class="error" id="bk-route-error">Please choose your route so we can confirm the fare.</p>
               </div>
               <div class="field span-2">
                 <label for="bk-pickup">Hotel, villa or pickup address</label>

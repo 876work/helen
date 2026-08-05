@@ -287,7 +287,10 @@ const EXPERIENCES = [
     duration: '30–90 min',
     group: 'Up to 6 per vehicle',
     maxGuests: 6,
-    price: 80,
+    /* Display only — the booking flow prices each transfer from the
+       route selected out of TRANSFER_ROUTES. Keep this equal to the
+       lowest published fare so the "from" price stays truthful. */
+    price: 25,
     pricingUnit: 'vehicle',
     img: 'assets/img/airport-transfer.svg',
     gallery: ['assets/img/airport-transfer.svg', 'assets/img/about-coast.svg', 'assets/img/about-village.svg'],
